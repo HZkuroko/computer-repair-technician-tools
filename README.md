@@ -1,3 +1,11 @@
+<img width="563" height="511" alt="image" src="https://github.com/user-attachments/assets/b5ddc566-a048-4f5f-b281-12fb5506628f" />
+
+<img width="403" height="259" alt="image" src="https://github.com/user-attachments/assets/fa85c6ed-1127-4a14-aa32-294c4ce7df15" />
+
+<img width="378" height="274" alt="image" src="https://github.com/user-attachments/assets/e1a08f03-b605-4a37-9a1f-6b4dbddc1c23" />
+
+
+
 # computer-repair-technician-tools
 A comprehensive batch utility for Windows system maintenance and optimization that I use at work
 
