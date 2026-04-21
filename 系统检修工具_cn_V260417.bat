@@ -265,38 +265,37 @@ goto :DISM
 
 :DISM_Local_repair
 echo.
-set /p drive="请输入已经加载的 ISO 镜像盘符 (例如输入 D): "
+set /p drive="请输入已挂载 ISO 的驱动器盘符（例如 D）："
 echo.
-echo 正在 %drive%:\sources 目录下搜索 Windows 镜像...
-echo.
-
-:: Note: Most retail ISOs use install.wim, but some use install.esd
 if exist "%drive%:\sources\install.wim" (
     set "wimpath=%drive%:\sources\install.wim"
 ) else if exist "%drive%:\sources\install.esd" (
     set "wimpath=%drive%:\sources\install.esd"
 ) else (
     color 4F
-    echo 错误: install.wim 或 install.esd 不存在于 %drive%:\sources 目录下。
-    echo 请确认镜像是否挂载正确，并输入正确的盘符。
+    echo 错误：在 %drive%:\sources 中未找到 install.wim 或 install.esd。
     pause
     goto :DISM
 )
-
-echo 成功找到镜像文件: %wimpath%
-echo 正在使用本地源文件修复 Windows，请耐心等待...
+echo ---------------------------------------------------------
+echo 该镜像中可用的 Windows 版本：
+echo ---------------------------------------------------------
+DISM /Get-WimInfo /WimFile:"%wimpath%"
+echo ---------------------------------------------------------
 echo.
-
-:: The /Source:wim: path points DISM to index 1 of the image file
-DISM /Online /Cleanup-Image /RestoreHealth /Source:wim:"%wimpath%":1 /LimitAccess
-
+set /p index="请输入您要使用的版本索引编号（Index）："
+echo.
+echo 正在使用索引 %index% 修复 Windows...
+echo.
+DISM /Online /Cleanup-Image /RestoreHealth /Source:wim:"%wimpath%":%index% /LimitAccess
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo 本地修复已成功完成！
+    echo DISM 修复成功完成。正在启动 SFC 扫描...
+    echo.
+    sfc /scannow
 ) else (
     echo.
-    echo 修复失败。如果您的 ISO 包含多个 Windows 版本 (如家庭版/专业版)，
-    echo 您可能需要修改脚本中的镜像索引号 (例如尝试修改为 :2 或 :3)。
+    echo DISM 修复失败。请确保您输入了正确的版本索引。
 )
 echo.
 pause
