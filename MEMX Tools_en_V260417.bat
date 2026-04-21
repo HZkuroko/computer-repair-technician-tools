@@ -263,10 +263,6 @@ goto :DISM
 echo.
 set /p drive="Enter the Drive Letter of the mounted ISO (e.g., D): "
 echo.
-echo Searching for Windows Image on %drive%:\sources...
-echo.
-
-:: Note: Most retail ISOs use install.wim, but some use install.esd
 if exist "%drive%:\sources\install.wim" (
     set "wimpath=%drive%:\sources\install.wim"
 ) else if exist "%drive%:\sources\install.esd" (
@@ -274,29 +270,33 @@ if exist "%drive%:\sources\install.wim" (
 ) else (
     color 4F
     echo ERROR: install.wim or install.esd not found on %drive%:\sources.
-    echo Please check your mounted drive and try again.
     pause
     goto :DISM
 )
-
-echo Found image at %wimpath%
-echo Repairing Windows using local source...
+echo ---------------------------------------------------------
+echo Available Windows Versions in this Image:
+echo ---------------------------------------------------------
+DISM /Get-WimInfo /WimFile:"%wimpath%"
+echo ---------------------------------------------------------
 echo.
-
-:: The /Source:wim: path points DISM to index 1 of the image file
-DISM /Online /Cleanup-Image /RestoreHealth /Source:wim:"%wimpath%":1 /LimitAccess
-
+set /p index="Enter the Index number you wish to use: "
+echo.
+echo Repairing Windows using Index: %index%...
+echo.
+DISM /Online /Cleanup-Image /RestoreHealth /Source:wim:"%wimpath%":%index% /LimitAccess
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo Local repair completed successfully.
+    echo DISM repair completed successfully. Starting SFC Scan...
+    echo.
+    sfc /scannow
 ) else (
     echo.
-    echo Repair failed. You may need to check the Image Index (e.g., :2, :3) 
-    echo if the ISO contains multiple Windows versions (Home/Pro).
+    echo DISM repair failed. Please ensure you selected the correct Index.
 )
 echo.
 pause
 goto :DISM
+
 
 :DISM_Online_repair
 echo Starting full system maintenance...
