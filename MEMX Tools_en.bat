@@ -2,7 +2,7 @@
 title System Utility Menu
 
 NET SESSION >nul 2>&1
-IF %ERRORLEVEL% NEQ 0 (
+if %ERRORLEVEL% NEQ 0 (
     color 4F
     echo.
     echo ==============================================================
@@ -15,7 +15,7 @@ IF %ERRORLEVEL% NEQ 0 (
     echo ==============================================================
     echo.
     pause
-    goto :eof
+    goto :exit_program
 )
 
 :main_menu
@@ -41,22 +41,24 @@ echo ******** New OS ********
 echo   9. Windows 11 Customization
 echo   10. Skip OOBE
 echo   11. Sysprep
+echo.
+echo *************
 echo   0. Exit
 echo.
 set /p choice="Enter your choice: "
 
-if "%choice%"=="1" goto :network_reset
-if "%choice%"=="2" goto :IP_and_PING_test
-if "%choice%"=="3" goto :Battery_Report
-if "%choice%"=="4" goto :Diskpart
-if "%choice%"=="5" goto :DISM
-if "%choice%"=="6" goto :Feature_install
-if "%choice%"=="7" goto :Windows_11_Home_to_Pro
-if "%choice%"=="8" goto :MAS
-if "%choice%"=="9" goto :Windows_11_Customization
-if "%choice%"=="10" goto :Skip_OOBE
-if "%choice%"=="11" goto :Sysprep
-if "%choice%"=="0" goto :eof
+if "%choice%"=="1"  goto :network_reset
+if "%choice%"=="2"  goto :ip_and_ping_test
+if "%choice%"=="3"  goto :battery_report
+if "%choice%"=="4"  goto :diskpart
+if "%choice%"=="5"  goto :dism
+if "%choice%"=="6"  goto :feature_install
+if "%choice%"=="7"  goto :windows_11_home_to_pro
+if "%choice%"=="8"  goto :mas
+if "%choice%"=="9"  goto :windows_11_customization
+if "%choice%"=="10" goto :skip_oobe
+if "%choice%"=="11" goto :sysprep
+if "%choice%"=="0"  goto :exit_program
 goto :invalid_choice
 
 :network_reset
@@ -77,38 +79,28 @@ echo Network reset commands completed.
 pause
 goto :main_menu
 
-:IP_and_PING_test
+:ip_and_ping_test
 cls
 echo =========================================
 echo           IP and PING test
 echo =========================================
 echo.
 ipconfig /all
-@echo off
-setlocal
-:PROMPT
-SET /P AREYOUSURE=Do you want to do PING test (Y/[N])?
-IF /I "%AREYOUSURE%" NEQ "Y" GOTO END
-ping 1.1.1.1
-:END
-@pause
-cls
-@echo off
-setlocal
-:PROMPT
-SET /P AREYOUSURE=Unstop PING test (Y/[N])?
-IF /I "%AREYOUSURE%" NEQ "Y" GOTO END
-echo Start to PING Google
-ping -t google.com
-:END
-endlocal
+echo.
+set /p do_ping="Do you want to do PING test (Y/[N])? "
+if /I "%do_ping%"=="Y" ping 1.1.1.1
+echo.
+set /p do_ping_loop="Unstoppable PING test (Y/[N])? "
+if /I "%do_ping_loop%"=="Y" (
+    echo Start to PING Google
+    ping -t google.com
+)
 echo.
 echo PING test completed.
 pause
 goto :main_menu
 
-
-:Battery_Report
+:battery_report
 cls
 echo =========================================
 echo             Battery Report
@@ -122,7 +114,7 @@ echo.
 pause
 goto :main_menu
 
-:Diskpart
+:diskpart
 cls
 echo =========================================
 echo                Diskpart
@@ -132,8 +124,7 @@ Diskpart.exe
 echo.
 goto :main_menu
 
-
-:Windows_11_Home_to_Pro
+:windows_11_home_to_pro
 cls
 echo =========================================
 echo          Windows 11 Home to Pro
@@ -143,26 +134,24 @@ sc config licensemanager start= auto & net start licensemanager
 sc config wuauserv start= auto & net start wuauserv
 slmgr /skms kms.03k.org
 changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
-@pause
-echo.
+pause
 goto :main_menu
 
-:MAS
+:mas
 cls
 echo =========================================
 echo                  MAS
 echo =========================================
-echo 
+echo.
 echo Copy the following to the powershell
-echo 
-echo "irm https://get.activated.win | iex"
+echo.
+echo "irm https://get.activated.win ^| iex"
 echo.
 powershell -Command "Start-Process powershell -Verb RunAs"
-PAUSE
-echo.
+pause
 goto :main_menu
 
-:Windows_11_Customization
+:windows_11_customization
 cls
 echo =========================================
 echo         Windows 11 Customization
@@ -170,76 +159,48 @@ echo =========================================
 echo.
 color 0A
 reg add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
-echo.
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LaunchTo" /t REG_DWORD /d "1" /f
 timeout /t 1 >nul
-echo.
 start ms-settings:easeofaccess-visualeffects
 timeout /t 1 >nul
-echo.
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecent" /t REG_DWORD /d "0" /f
-timeout /t 1 >nul
-echo.
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecent"   /t REG_DWORD /d "0" /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowFrequent" /t REG_DWORD /d "0" /f
 timeout /t 1 >nul
-echo.
 rundll32.exe shell32.dll,Options_RunDLL 0
 timeout /t 2 >nul
-echo.
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f >nul
 timeout /t 3 >nul
-echo.
 start ms-settings:taskbar
-echo.
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v SearchboxTaskbarMode /t REG_DWORD /d 1 /f >nul
 echo.
-@pause
-echo.
+pause
 goto :main_menu
 
-:Skip_OOBE
+:skip_oobe
 cls
 echo =========================================
 echo               Skip OOBE
 echo =========================================
 echo.
-Start ms-cxh:localonly
+start ms-cxh:localonly
 echo.
 goto :main_menu
 
-:Sysprep
+:sysprep
 cls
 echo =========================================
 echo                Sysprep
 echo =========================================
 echo.
 C:\Windows\System32\sysprep\sysprep.exe
-@pause
-echo.
-goto :main_menu
-
-:invalid_choice
-cls
-echo =========================================
-echo           Invalid Choice!
-echo =========================================
-color 4F
-echo.
-echo Please enter a valid option from the menu.
-echo.
 pause
 goto :main_menu
 
-:eof
+:dism
 cls
-echo Exiting System Utility. Goodbye!
-timeout /t 2 >nul
-
-
-:DISM
-cls
+color 0A
 echo =========================================
-echo.           DISM ^& WMIC
+echo            DISM ^& WMIC
 echo =========================================
 echo.
 echo   1. Local DISM repair
@@ -251,15 +212,15 @@ echo   0. Back to Main Menu
 echo.
 set /p dism_choice="Select a repair option: "
 
-if "%dism_choice%"=="1" goto :DISM_Local_repair
-if "%dism_choice%"=="2" goto :DISM_Online_repair
-if "%dism_choice%"=="3" goto :DISM_WinPE_Offline
-if "%dism_choice%"=="4" goto :Product_key_extract
-if "%dism_choice%"=="5" goto :Get_serialnumber
+if "%dism_choice%"=="1" goto :dism_local_repair
+if "%dism_choice%"=="2" goto :dism_online_repair
+if "%dism_choice%"=="3" goto :dism_winpe_offline
+if "%dism_choice%"=="4" goto :product_key_extract
+if "%dism_choice%"=="5" goto :get_serialnumber
 if "%dism_choice%"=="0" goto :main_menu
-goto :DISM
+goto :dism
 
-:DISM_Local_repair
+:dism_local_repair
 echo.
 set /p drive="Enter the Drive Letter of the mounted ISO (e.g., D): "
 echo.
@@ -271,7 +232,8 @@ if exist "%drive%:\sources\install.wim" (
     color 4F
     echo ERROR: install.wim or install.esd not found on %drive%:\sources.
     pause
-    goto :DISM
+    color 0A
+    goto :dism
 )
 echo ---------------------------------------------------------
 echo Available Windows Versions in this Image:
@@ -295,10 +257,9 @@ if %ERRORLEVEL% EQU 0 (
 )
 echo.
 pause
-goto :DISM
+goto :dism
 
-
-:DISM_Online_repair
+:dism_online_repair
 echo Starting full system maintenance...
 echo 1/3: DISM RestoreHealth...
 DISM /Online /Cleanup-Image /RestoreHealth
@@ -309,9 +270,9 @@ chkdsk C: /f /r /x
 echo.
 echo Full maintenance cycle completed.
 pause
-goto :DISM
+goto :dism
 
-:Product_key_extract
+:product_key_extract
 echo.
 wmic path SoftwareLicensingService get OA3xOriginalProductKey
 echo.
@@ -324,9 +285,9 @@ echo.
 powershell -Command "Start-Process powershell -Verb RunAs"
 echo.
 pause
-goto :DISM
+goto :dism
 
-:DISM_WinPE_Offline
+:dism_winpe_offline
 :: 1. Ask for Target Windows Drive
 set /p target_drive="Enter the Target Windows drive letter (e.g., C or D): "
 
@@ -353,8 +314,8 @@ if not defined wimpath (
     echo [ERROR] Could not find install.wim or .esd on [%iso_drive%:\sources]
     echo Please verify your drive letters.
     pause
-    color 07
-    goto :DISM
+    color 0A
+    goto :dism
 )
 
 :: 6. Execute the custom command
@@ -372,23 +333,20 @@ sfc /scannow /offbootdir=%target_drive%:\ /offwindir=%target_drive%:\Windows
 
 pause
 color 0A
-goto :DISM
+goto :dism
 
-:Get_serialnumber
+:get_serialnumber
 echo.
 wmic bios get serialnumber
-@pause
+pause
 echo.
-goto :DISM
+goto :dism
 
-:main_menu
-goto main_menu
-
-
-:Feature_install
+:feature_install
 cls
+color 0A
 echo =========================================
-echo.           Feature Install
+echo            Feature Install
 echo =========================================
 echo.
 echo  1. Install Newest PowerShell (Fresh)
@@ -399,45 +357,45 @@ echo  5. WMIC Offline install
 echo  6. Python install
 echo  0. Back to Main Menu
 echo.
-set /p feature_choice="Select a repair option: "
+set /p feature_choice="Select an option: "
 
-if "%feature_choice%"=="1" goto :install
-if "%feature_choice%"=="2" goto :upgrade
-if "%feature_choice%"=="3" goto :dotnet
-if "%feature_choice%"=="4" goto :WMIC_online_install
-if "%feature_choice%"=="5" goto :WMIC_offline_install
+if "%feature_choice%"=="1" goto :install_powershell
+if "%feature_choice%"=="2" goto :upgrade_powershell
+if "%feature_choice%"=="3" goto :install_dotnet
+if "%feature_choice%"=="4" goto :wmic_online_install
+if "%feature_choice%"=="5" goto :wmic_offline_install
 if "%feature_choice%"=="6" goto :python_install
 if "%feature_choice%"=="0" goto :main_menu
-goto :DISM
+goto :feature_install
 
-:install
+:install_powershell
 echo.
 echo Running: winget install --id Microsoft.PowerShell --source winget
 winget install --id Microsoft.PowerShell --source winget
 pause
-goto Feature_install
+goto :feature_install
 
-:upgrade
+:upgrade_powershell
 echo.
 echo Running: winget upgrade --id Microsoft.PowerShell
 winget upgrade --id Microsoft.PowerShell
 pause
-goto Feature_install
+goto :feature_install
 
-:dotnet
+:install_dotnet
 echo.
 echo Running: winget install --id Microsoft.DotNet.SDK.10 --source winget
 winget install --id Microsoft.DotNet.SDK.10 --source winget
 pause
-goto Feature_install
+goto :feature_install
 
-:WMIC_online_install
+:wmic_online_install
 echo.
 DISM /Online /Add-Capability /CapabilityName:WMIC~~~~
 pause
-goto Feature_install
+goto :feature_install
 
-:WMIC_offline_install
+:wmic_offline_install
 echo.
 set /p drive="Enter the Drive Letter of the mounted ISO (e.g., D): "
 echo.
@@ -453,12 +411,15 @@ if %ERRORLEVEL% EQU 0 (
 ) else (
     color 4F
     echo.
-    echo ERROR: Installation failed. 
+    echo ERROR: Installation failed.
     echo Please ensure the ISO is mounted to [%drive%:] and contains the 'sources\sxs' folder.
+    pause
+    color 0A
+    goto :feature_install
 )
 echo.
 pause
-goto :Feature_install
+goto :feature_install
 
 :python_install
 echo.
@@ -468,7 +429,24 @@ echo.
 echo [*] Upgrading pip...
 py -m pip install --upgrade pip
 pause
-goto Feature_install
+goto :feature_install
 
-:main_menu
-goto main_menu
+:invalid_choice
+cls
+color 4F
+echo =========================================
+echo           Invalid Choice!
+echo =========================================
+echo.
+echo Please enter a valid option from the menu.
+echo.
+pause
+color 0A
+goto :main_menu
+
+:exit_program
+cls
+echo Exiting System Utility. Goodbye!
+timeout /t 2 >nul
+endlocal
+exit /b 0
