@@ -143,11 +143,7 @@ echo =========================================
 echo                  MAS
 echo =========================================
 echo.
-echo Copy the following to the powershell
-echo.
-echo "irm https://get.activated.win ^| iex"
-echo.
-powershell -Command "Start-Process powershell -Verb RunAs"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://get.activated.win | iex"
 pause
 goto :main_menu
 
