@@ -145,11 +145,7 @@ echo =========================================
 echo                  MAS
 echo =========================================
 echo.
-echo 请将以下内容复制并粘贴到 PowerShell 中：
-echo.
-echo "irm https://get.activated.win ^| iex"
-echo.
-powershell -Command "Start-Process powershell -Verb RunAs"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://get.activated.win | iex"
 pause
 goto :main_menu
 
